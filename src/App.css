@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  min-width: 360px;
 }
 
 .App-header {
@@ -9,3 +10,17 @@
   color: white;
 }
 
+label {
+	display: block;
+	margin: 10px;
+}
+
+.input {
+	display: inline-block;
+	margin: 10px 5px 10px 10px;
+}
+
+.btn {
+	display: block;
+	margin: 10px auto;
+}

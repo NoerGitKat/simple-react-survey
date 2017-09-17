@@ -2,6 +2,19 @@ import React, { Component } from 'react';
 
 import './App.css';
 
+import uuid from 'uuid';
+import firebase from 'firebase';
+
+var config = {
+        apiKey: "AIzaSyC13J3WBhGVoLNibPYR-Ic-xNLh3gYQe7I",
+        authDomain: "simplesurvey-2f490.firebaseapp.com",
+        databaseURL: "https://simplesurvey-2f490.firebaseio.com",
+        projectId: "simplesurvey-2f490",
+        storageBucket: "simplesurvey-2f490.appspot.com",
+        messagingSenderId: "384989471257"
+      };
+      firebase.initializeApp(config);
+
 class App extends Component {
   //allows for creating state, binding functions
   constructor(props) {
@@ -20,21 +33,34 @@ class App extends Component {
       submitted: false
     }
 
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
+    this.handleNameSubmit = this.handleNameSubmit.bind(this);
+    this.handleQuestionsSubmit = this.handleQuestionsSubmit.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
   }
 
-  handleSubmit(event) {
+  handleNameSubmit(event) {
     const name = this.refs.name.value;
 
-    event.preventDefault();     //prevent page refresh after submit
     this.setState({
+      id: uuid.v1(),
       name: name
     })
+
+    event.preventDefault();     //prevent page refresh after submit
   }
 
-  handleQuestionSubmit(event) {
+  handleQuestionsSubmit(event) {
+    console.log('Questions submitting...');
+    firebase.database().ref(`surveys/${this.state.id}`).set({
+      name: this.state.name,
+      answers: this.state.answers
+    })
+
+    this.setState({
+      submitted: true
+    }, () => {
+      console.log('Questions submitted!');
+    })
     event.preventDefault();   //prevent page refresh after submit
 
   }
@@ -59,52 +85,39 @@ class App extends Component {
       user = <h2>Welcome {this.state.name}</h2>
       questions = <span>
         <h3>Survey Questions</h3>
-        <form onSubmit={this.handleQuestionSubmit}>
+        <form onSubmit={this.handleQuestionsSubmit}>
           <label htmlFor="">What is your favorite sci-fi book?</label>
-          <br/>
-          <br/>
-          <input type="radio" name='q1' value='Stranger in a Strangeland' onChange={this.handleQuestionChange}/> Stranger in a Strangeland
-          <input type="radio" name='q1' value='Foundation' onChange={this.handleQuestionChange}/> Foundation
-          <input type="radio" name='q1' value='Brave New World' onChange={this.handleQuestionChange}/> Brave New World
-          <br/>
-          <br/>
-          <br/>
+            <input className='input' type="radio" name='q1' value='Stranger in a Strangeland' onChange={this.handleQuestionChange}/> Stranger in a Strangeland
+            <input className='input' type="radio" name='q1' value='Foundation' onChange={this.handleQuestionChange}/> Foundation
+            <input className='input' type="radio" name='q1' value='Brave New World' onChange={this.handleQuestionChange}/> Brave New World
           <label htmlFor="">What is your political view?</label>
-          <br/>
-          <br/>
-          <input type="radio" name='q2' value='Libertarian' onChange={this.handleQuestionChange}/> Libertarian
-          <input type="radio" name='q2' value='Liberal' onChange={this.handleQuestionChange}/> Liberal
-          <input type="radio" name='q2' value='Conservative' onChange={this.handleQuestionChange}/> Conservative
-          <br/>
-          <br/>
-          <br/>
+            <input className='input' type="radio" name='q2' value='Libertarian' onChange={this.handleQuestionChange}/> Libertarian
+            <input className='input' type="radio" name='q2' value='Liberal' onChange={this.handleQuestionChange}/> Liberal
+            <input className='input' type="radio" name='q2' value='Conservative' onChange={this.handleQuestionChange}/> Conservative
           <label htmlFor="">What is your ideal weekday?</label>
-          <br/>
-          <br/>
-          <input type="radio" name='q3' value='Work hard, play hard' onChange={this.handleQuestionChange}/> Work hard, play hard
-          <input type="radio" name='q3' value='Doing nothing all day' onChange={this.handleQuestionChange}/> Doing nothing all day
-          <input type="radio" name='q3' value='Slave away and watch tv' onChange={this.handleQuestionChange}/> Slave away and watch tv
-          <br/>
-          <br/>
-          <br/>
+            <input className='input' type="radio" name='q3' value='Work hard, play hard' onChange={this.handleQuestionChange}/> Work hard, play hard
+            <input className='input' type="radio" name='q3' value='Doing nothing all day' onChange={this.handleQuestionChange}/> Doing nothing all day
+            <input className='input' type="radio" name='q3' value='Slave away and watch tv' onChange={this.handleQuestionChange}/> Slave away and watch tv
           <label htmlFor="">What is your age?</label>
-          <br/>
-          <br/>
-          <input type="radio" name='q4' value='20 - 35' onChange={this.handleQuestionChange}/> 20 - 35
-          <input type="radio" name='q4' value='36 - 54' onChange={this.handleQuestionChange}/> 36 - 54
-          <input type="radio" name='q4' value='55 - 99' onChange={this.handleQuestionChange}/> 55 - 99
+            <input className='input' type="radio" name='q4' value='20 - 35' onChange={this.handleQuestionChange}/> 20 - 35
+            <input className='input' type="radio" name='q4' value='36 - 54' onChange={this.handleQuestionChange}/> 36 - 54
+            <input className='input' type="radio" name='q4' value='55 - 99' onChange={this.handleQuestionChange}/> 55 - 99
+          <button className='btn'>Submit Questions!</button>
         </form>
       </span>
     } else if(!this.state.name && this.state.submitted === false) {
       user = <span>
         <h2>Please enter your name to begin the survey</h2>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleNameSubmit}>
           <input type="text" placeholder='Enter Name...' ref='name'/>
         </form>
       </span>
       questions = '';
     } else if(this.state.submitted === true) {
-
+      user =  <div>
+                <h1>Your answers are submitted, {this.state.name}!</h1>
+                <p>Thank you for your participation.</p>
+              </div>
     }
 
     return (
