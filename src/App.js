@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 
 import './App.css';
 
-import uuid from 'uuid';
-import firebase from 'firebase';
+import uuid from 'uuid';          //to generate random id number
+import firebase from 'firebase';  //to make state persistent externally
 
+//allows for connection with Firebase service
 var config = {
         apiKey: "AIzaSyC13J3WBhGVoLNibPYR-Ic-xNLh3gYQe7I",
         authDomain: "simplesurvey-2f490.firebaseapp.com",
@@ -33,11 +34,13 @@ class App extends Component {
       submitted: false
     }
 
+    //bind the keyword this so methods can refer to this component instead of local scope of function
     this.handleNameSubmit = this.handleNameSubmit.bind(this);
     this.handleQuestionsSubmit = this.handleQuestionsSubmit.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
   }
 
+  //updates state with new id and name
   handleNameSubmit(event) {
     const name = this.refs.name.value;
 
@@ -49,6 +52,7 @@ class App extends Component {
     event.preventDefault();     //prevent page refresh after submit
   }
 
+  //connects to database to save state and make it persistent
   handleQuestionsSubmit(event) {
     console.log('Questions submitting...');
     firebase.database().ref(`surveys/${this.state.id}`).set({
@@ -65,6 +69,7 @@ class App extends Component {
 
   }
 
+  //change state after every input change
   handleQuestionChange(event) {
     let answers = this.state.answers;
     if(event.target.name === 'q1') {
@@ -79,8 +84,11 @@ class App extends Component {
   }
 
   render() {
+    //initialize variables
     var user;
     var questions;
+
+    //control statements to show different content depending on state
     if(this.state.name && this.state.submitted === false) {
       user = <h2>Welcome {this.state.name}</h2>
       questions = <span>
